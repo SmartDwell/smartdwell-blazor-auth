@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartDwell.Blazor.Auth", "SmartDwell.Blazor.Auth\SmartDwell.Blazor.Auth.csproj", "{02922736-FDAC-4A33-9B56-6BA13F2A642B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{EC02514E-3651-4247-AA51-D46ED44BA3F2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{DCDC57CA-5388-4461-931E-653DE5B30F20}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -8,9 +10,13 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{02922736-FDAC-4A33-9B56-6BA13F2A642B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{02922736-FDAC-4A33-9B56-6BA13F2A642B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{02922736-FDAC-4A33-9B56-6BA13F2A642B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{02922736-FDAC-4A33-9B56-6BA13F2A642B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC02514E-3651-4247-AA51-D46ED44BA3F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC02514E-3651-4247-AA51-D46ED44BA3F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC02514E-3651-4247-AA51-D46ED44BA3F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC02514E-3651-4247-AA51-D46ED44BA3F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DCDC57CA-5388-4461-931E-653DE5B30F20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCDC57CA-5388-4461-931E-653DE5B30F20}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DCDC57CA-5388-4461-931E-653DE5B30F20}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DCDC57CA-5388-4461-931E-653DE5B30F20}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
