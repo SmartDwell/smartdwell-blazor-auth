@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Components;
+using Shared;
 
 namespace Client.Shared;
 
@@ -8,23 +9,22 @@ namespace Client.Shared;
 /// </summary>
 public class AuthService : IDisposable
 {
+    private readonly HttpClient _httpClient;
     private readonly HttpClient _authHttpClient;
-    private readonly AuthStateProvider _authStateProvider;
     private readonly TokenRepository _tokenRepository;
     private readonly NavigationManager _navigation;
 
     /// <summary>
     /// Конструктор класса <see cref="AuthService"/>.
     /// </summary>
-    /// <param name="authStateProvider">Поставщик состояния авторизации.</param>
+    /// <param name="httpClient">Http-клиент.</param>
     /// <param name="tokenRepository">Репозиторий токенов.</param>
     /// <param name="navigation">Менеджер навигации.</param>
     /// <param name="authServicePath">Путь к сервису авторизации.</param>
-    public AuthService(AuthStateProvider authStateProvider,
-        TokenRepository tokenRepository, NavigationManager navigation, string authServicePath)
+    public AuthService(HttpClient httpClient, TokenRepository tokenRepository, NavigationManager navigation, string authServicePath)
     {
+        _httpClient = httpClient;
         _authHttpClient = new HttpClient { BaseAddress = new Uri(authServicePath) };
-        _authStateProvider = authStateProvider;
         _tokenRepository = tokenRepository;
         _navigation = navigation;
     }
@@ -63,13 +63,25 @@ public class AuthService : IDisposable
             var tokensDto = await response.Content.ReadFromJsonAsync<TokensDto>()
                             ?? throw new Exception("Ошибка при отправке кода.");
 
-            await _tokenRepository.SetTokensAsync(tokensDto.AccessToken, tokensDto.RefreshToken);
-            await _authStateProvider.Login(tokensDto.AccessToken, tokensDto.RefreshToken);
+            await SaveTokens(tokensDto);
             return true;
         }
 
         var errorMessage = await response.Content.ReadAsStringAsync();
         throw new Exception($"Ошибка: {errorMessage}.");
+    }
+    
+    private async Task SaveTokens(TokensDto tokensDto)
+    {
+        var response = await _httpClient.PostAsJsonAsync(RouteConstants.ConfigurationData.SaveTokensUrl(), tokensDto);
+        
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorMessage = await response.Content.ReadAsStringAsync();
+            throw new Exception($"Ошибка: {errorMessage}");
+        }
+        
+        await _tokenRepository.SetTokensAsync(tokensDto.AccessToken, tokensDto.RefreshToken);
     }
 
     /// <summary>
@@ -79,7 +91,6 @@ public class AuthService : IDisposable
     {
         await _tokenRepository.ClearTokensAsync();
 
-        _authStateProvider.Logout();
         _navigation.NavigateTo("/login");
     }
     

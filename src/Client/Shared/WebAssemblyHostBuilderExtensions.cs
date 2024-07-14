@@ -21,22 +21,20 @@ public static class WebAssemblyHostBuilderExtensions
     {
         builder.Services.AddBlazoredLocalStorage();
         builder.Services.AddScoped<TokenRepository>();
-        builder.Services.AddSingleton<AuthStateProvider>();
-        builder.Services.AddSingleton<AuthenticationStateProvider>(provider => provider.GetRequiredService<AuthStateProvider>());
         
         var httpClient = new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) };
         builder.Services.AddScoped(sp => httpClient);
 
-        var configurationOptions = await httpClient.GetFromJsonAsync<ConfigurationOptions>(RouteConstants.ConfigurationData.Options);
+        var configurationOptions = await httpClient.GetFromJsonAsync<ConfigurationOptions>(RouteConstants.ConfigurationData.GetOptionsUrl());
         if (configurationOptions is null)
         {
-            throw new InvalidOperationException("Не удалось загрузить конфигурацию.");
+            throw new InvalidOperationException("Not able to load configuration.");
         }
         
         // Регистрация сервиса аутентификации
         builder.Services.AddScoped<AuthService>(sp =>
             new AuthService(
-                authStateProvider: sp.GetRequiredService<AuthStateProvider>(),
+                httpClient: sp.GetRequiredService<HttpClient>(),
                 tokenRepository: sp.GetRequiredService<TokenRepository>(),
                 navigation: sp.GetRequiredService<NavigationManager>(),
                 authServicePath: configurationOptions.AuthenticationServerUrl
@@ -45,7 +43,6 @@ public static class WebAssemblyHostBuilderExtensions
         builder.Services.AddAuthorizationCore();
         
         var host = builder.Build();
-        await host.Services.GetRequiredService<AuthStateProvider>().InitializeAuthenticationStateAsync();
 
         return host;
     }

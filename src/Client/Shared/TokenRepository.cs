@@ -1,7 +1,7 @@
 using System.Reflection;
 using Blazored.LocalStorage;
 
-namespace Client.Shared;
+namespace Shared;
 
 /// <summary>
 /// Репозиторий токенов.
