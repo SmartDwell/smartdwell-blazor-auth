@@ -1,0 +1,102 @@
+@inject NavigationManager Navigation
+@inject AuthService AuthService
+
+<div style="display: flex; flex-direction: column;">
+    <div>
+        @if (string.IsNullOrEmpty(_verifyCodeDto.TicketId))
+        {
+            <EditForm Model="_requestCodeDto" OnValidSubmit="@RequestCode">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <InputText @bind-Value="_requestCodeDto.Login" placeholder="Login" />
+                <button type="submit">Request code</button>
+            </EditForm>
+        }
+        else
+        {
+            <EditForm Model="_verifyCodeDto" OnValidSubmit="@VerifyCode">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <InputText @bind-Value="_verifyCodeDto.Code" placeholder="Code" />
+                <button type="submit">Verify code</button>
+            </EditForm>
+        }
+    </div>
+    @if (!string.IsNullOrEmpty(_errorMessages))
+    {
+        <div>
+            <p>@_errorMessages</p>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string RedirectUri { get; set; } = string.Empty;
+    
+    private readonly AuthRequestCodeDto _requestCodeDto = new()
+    {
+        Login = "17moron@bk.ru",
+    };
+    private AuthVerifyCodeDto _verifyCodeDto = new();
+    private string _errorMessages = string.Empty;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Console.WriteLine($"RedirectUri -> {RedirectUri}");
+        }
+        base.OnAfterRender(firstRender);
+    }
+
+    #region Data
+
+    private async Task RequestCode()
+    {
+        _errorMessages = string.Empty;
+        try
+        {
+            var ticketDto = await AuthService.RequestCodeAsync(_requestCodeDto);
+            _verifyCodeDto = new AuthVerifyCodeDto
+            {
+                TicketId = ticketDto.TicketId,
+            };
+        }
+        catch (Exception e)
+        {
+            _errorMessages = e.Message;
+        }
+        
+        StateHasChanged();
+    }
+
+    private async Task VerifyCode()
+    {
+        _errorMessages = string.Empty;
+        try
+        {
+            var verified = await AuthService.VerifyCodeAsync(_verifyCodeDto);
+            if (verified)
+            {
+                var url = !string.IsNullOrEmpty(RedirectUri) ? RedirectUri : Navigation.BaseUri;
+                Navigation.NavigateTo(url, true, true);
+            }
+            else
+            {
+                _errorMessages = "Что-то пошло не так...";
+            }
+        }
+        catch (Exception e)
+        {
+            _errorMessages = e.Message;
+            Console.WriteLine(e);
+        }
+        
+        StateHasChanged();
+    }
+
+    #endregion
+}

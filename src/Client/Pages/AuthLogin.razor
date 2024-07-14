@@ -1,0 +1,12 @@
+@page "/login/{*RedirectUri}"
+
+<Login RedirectUri="@RedirectUri" />
+
+@code
+{
+    /// <summary>
+    /// Адрес перенаправления после аутентификации.
+    /// </summary>
+    [Parameter]
+    public string? RedirectUri { get; init; }
+}

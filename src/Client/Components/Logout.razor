@@ -1,0 +1,18 @@
+@inject NavigationManager Navigation
+@inject AuthService AuthService
+
+Выход из системы
+
+@code {
+    [Parameter, EditorRequired]
+    public string RedirectUri { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await AuthService.LogoutAsync();
+        var url = !string.IsNullOrEmpty(RedirectUri) ? RedirectUri : Navigation.BaseUri;
+        Navigation.NavigateTo(url, true);
+        
+        await base.OnInitializedAsync();
+    }
+}
